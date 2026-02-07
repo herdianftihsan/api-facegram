@@ -22,6 +22,9 @@ Route::prefix('v1')->group(function () {
         Route::post('{username}/follow',[FollowingCOntroller::class,'store']);
         Route::delete('{username}/unfollow',[FollowingCOntroller::class,'destroy']);
         Route::get('{username}/following',[FollowingCOntroller::class,'index']);
+        Route::put('{username}/accept',[FollowingCOntroller::class,'update']);
+        Route::get('{username}/followers',[FollowingCOntroller::class,'show']);
+
     });
 
 

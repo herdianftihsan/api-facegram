@@ -24,7 +24,7 @@ class FollowingCOntroller extends Controller
         }
 
         return response()->json([
-            'following' => [$user],
+            'following' => $user,
         ]);
     }
 
@@ -54,7 +54,7 @@ class FollowingCOntroller extends Controller
         if (Follow::where('follower_id',Auth::id())->where('following_id',$user->id)->exists()) {
            return response()->json([
              "message" => "You are already followed",
-                "status" => $isPrivate ?  "following" : "requested" ,
+            "status" => $isPrivate ?  "following" : "requested" ,
            ],422);
         }
 
@@ -63,7 +63,7 @@ class FollowingCOntroller extends Controller
          Follow::create([
             'follower_id' => Auth::id(),
             'following_id' => $user->id,
-            'is_accepted' => 1
+            'is_accepted' => $isPrivate ? 1 : 0,
         ]);
 
         return response()->json([
@@ -75,9 +75,21 @@ class FollowingCOntroller extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $username)
     {
-        //
+        if (!$user = User::where('username',$username)->first()) {
+            return response()->json(["message" => "User not found"], 404);
+        }
+
+        $follower = Follow::where('follower_id', Auth::id())->where('following_id',$user->id)->first();
+
+        if (!$follower) {
+            return response()->json(["message" => "User not found"], 404);
+        }
+
+        return response()->json([
+            'follower'=>$user,
+        ]);
     }
 
     /**
@@ -91,9 +103,30 @@ class FollowingCOntroller extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update($username)
     {
-        //
+        if (!$user = User::where('username',$username)->first()) {
+            return response()->json(["message" => "User not found"], 404);
+        }
+
+
+        $accFollower = Follow::where('following_id',$user->id)->where('follower_id',Auth::id())->first();
+
+        if (!$accFollower) {
+            return response()->json(["message" => "The user is not following you"], 422);
+        }
+
+        if ($accFollower->is_accepted == 1) {
+           return response() ->json(["message" => "Follow request is already accepted"],422);
+        } 
+
+        $accFollower->update([
+            'is_accepted' => 1,
+        ]);
+        
+        return response()->json([
+            "message" => "Follow request accepted"
+        ]);
     }
 
     /**
