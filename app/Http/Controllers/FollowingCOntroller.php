@@ -49,12 +49,16 @@ class FollowingCOntroller extends Controller
             return response()->json(["message" => "You are not allowed to follow yourself"],422);
         }
 
+        $isPrivate = $user->is_private ? 0 : 1;
+
         if (Follow::where('follower_id',Auth::id())->where('following_id',$user->id)->exists()) {
            return response()->json([
              "message" => "You are already followed",
-             "status" => "following" | "requested"
+                "status" => $isPrivate ?  "following" : "requested" ,
            ],422);
         }
+
+        $isPrivate = $user->is_private ? 0 :1;  
 
          Follow::create([
             'follower_id' => Auth::id(),
@@ -64,7 +68,7 @@ class FollowingCOntroller extends Controller
 
         return response()->json([
             "message" => "Follow success",
-            "status"=> "following" | "requested"
+            "status"=> $isPrivate ? "following" :  "requested" ,
         ]);
     }
 
