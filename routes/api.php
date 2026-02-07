@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthCOntroller;
+use App\Http\Controllers\FollowingCOntroller;
 use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,13 @@ Route::prefix('v1')->group(function () {
         Route::post('/login', [AuthCOntroller::class, 'login']);
         Route::post('/logout', [AuthCOntroller::class, 'logout']);
     });
+
+    Route::middleware('auth:sanctum')->prefix('/users')->group(function (){
+        Route::post('{username}/follow',[FollowingCOntroller::class,'store']);
+        Route::delete('{username}/unfollow',[FollowingCOntroller::class,'destroy']);
+        Route::get('{username}/following',[FollowingCOntroller::class,'index']);
+    });
+
 
     Route::middleware('auth:sanctum')->apiResource('/posts',PostController::class);
 });
