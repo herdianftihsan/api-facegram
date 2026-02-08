@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthCOntroller;
 use App\Http\Controllers\FollowingCOntroller;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,8 +25,9 @@ Route::prefix('v1')->group(function () {
         Route::get('{username}/following',[FollowingCOntroller::class,'index']);
         Route::put('{username}/accept',[FollowingCOntroller::class,'update']);
         Route::get('{username}/followers',[FollowingCOntroller::class,'show']);
-
-    });
+        Route::get('/',[UserController::class,'index']);
+        Route::get('/{username}',[UserController::class,'show']);
+        });
 
 
     Route::middleware('auth:sanctum')->apiResource('/posts',PostController::class);
